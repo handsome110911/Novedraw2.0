@@ -46,7 +46,7 @@ button {
 }
 
 .background-image {
-  background: url('../../novebg.jpg') no-repeat center center fixed;
+  background: url('/Novedraw2.0/novebg.jpg') no-repeat center center fixed;
   background-size: cover;
   z-index: -2;
 }
