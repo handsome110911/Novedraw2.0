@@ -1,1 +1,382 @@
+:root {
+  --bg-dark: #091120;
+  --panel-bg: rgba(12, 20, 38, 0.72);
+  --panel-border: rgba(255, 255, 255, 0.14);
+  --text-main: #f6f7fb;
+  --text-soft: rgba(246, 247, 251, 0.76);
+  --accent-primary: #f163b4;
+  --accent-secondary: #6cb4ff;
+  --accent-muted: rgba(255, 255, 255, 0.12);
+  --shadow-lg: 0 18px 45px rgba(0, 0, 0, 0.35);
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
 
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Arial, "Microsoft JhengHei", "PingFang TC", sans-serif;
+  color: var(--text-main);
+  background: var(--bg-dark);
+}
+
+body {
+  position: relative;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+.background-image,
+.background-overlay {
+  position: fixed;
+  inset: 0;
+}
+
+.background-image {
+  background: url('../../novebg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  z-index: -2;
+}
+
+.background-overlay {
+  background:
+    linear-gradient(180deg, rgba(7, 12, 23, 0.34) 0%, rgba(7, 12, 23, 0.84) 100%),
+    rgba(0, 0, 0, 0.28);
+  z-index: -1;
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.hero__tag {
+  margin: 0 0 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-size: 0.8rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 1.1;
+  text-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.hero__description {
+  width: min(760px, 100%);
+  margin: 16px auto 0;
+  color: var(--text-soft);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.panel,
+.draw-card,
+.result-card,
+.probability-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.panel,
+.draw-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.panel {
+  padding: 20px;
+}
+
+.panel__header,
+.results-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel__header h2,
+.probability-card h2,
+.results-section__header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.panel__hint,
+.panel__empty,
+.results-placeholder {
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.panel__empty,
+.results-placeholder {
+  margin: 14px 0 0;
+}
+
+.leaderboard-list,
+.probability-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+
+.leaderboard-list {
+  display: grid;
+  gap: 10px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.leaderboard-list li,
+.probability-list li,
+.result-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+}
+
+.leaderboard-list li {
+  padding: 12px 14px;
+  line-height: 1.45;
+}
+
+.retry-counter__value {
+  margin: 20px 0 10px;
+  text-align: center;
+}
+
+.retry-counter__value span {
+  display: inline-block;
+  min-width: 96px;
+  padding: 16px 20px;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  border-radius: 18px;
+  background: rgba(108, 180, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(108, 180, 255, 0.28);
+}
+
+.draw-card {
+  padding: 24px;
+}
+
+.input-group {
+  display: grid;
+  gap: 8px;
+}
+
+.input-group__label {
+  font-weight: 700;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  outline: none;
+}
+
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.input-group input:focus {
+  border-color: rgba(108, 180, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(108, 180, 255, 0.18);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0 24px;
+}
+
+.button {
+  border-radius: 999px;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  color: #fff;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button--primary {
+  background: linear-gradient(135deg, #ff5ca8, #f163b4);
+  box-shadow: 0 10px 25px rgba(241, 99, 180, 0.28);
+}
+
+.button--secondary {
+  background: linear-gradient(135deg, #4d93ff, #6cb4ff);
+  box-shadow: 0 10px 25px rgba(108, 180, 255, 0.25);
+}
+
+.button--ghost {
+  background: var(--accent-muted);
+}
+
+.probability-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+.probability-list {
+  display: grid;
+  gap: 10px;
+}
+
+.probability-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+}
+
+.probability-list strong {
+  font-size: 0.95rem;
+}
+
+.probability-list span {
+  color: var(--text-soft);
+}
+
+.results-section {
+  margin-top: 24px;
+}
+
+.results-container {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.result-card {
+  padding: 16px 18px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.result-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.result-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+}
+
+.result-card__prize {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.result-card--grand .result-card__prize {
+  color: #ff9fd6;
+  text-shadow: 0 0 12px rgba(255, 159, 214, 0.38);
+}
+
+.result-card--retry .result-card__prize {
+  color: #8ec7ff;
+  text-shadow: 0 0 12px rgba(142, 199, 255, 0.35);
+}
+
+@media (max-width: 860px) {
+  .page-shell {
+    width: min(100% - 24px, 860px);
+    padding-top: 20px;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .panel__header,
+  .results-section__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-shell {
+    width: min(100% - 16px, 560px);
+    padding-bottom: 24px;
+  }
+
+  .panel,
+  .draw-card,
+  .probability-card {
+    padding: 16px;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .probability-list li,
+  .result-card__meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
