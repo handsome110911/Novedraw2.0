@@ -23,13 +23,17 @@
       <section class="panel">
         <div class="panel__header">
           <h2>大獎榜單</h2>
-          <button id="clearLeaderboardBtn" class="button button--ghost">清空榜單</button>
+          <button id="resetLeaderboardButton" class="button button--ghost">清空榜單</button>
         </div>
         <ul id="leaderboardList" class="leaderboard-list"></ul>
+        <p id="leaderboardEmpty" class="panel__empty">目前還沒有大獎得主。</p>
       </section>
 
       <section class="panel retry-counter">
-        <h2>再來一次</h2>
+        <div class="panel__header">
+          <h2>再來一次</h2>
+          <button id="resetRetryButton" class="button button--ghost">重置次數</button>
+        </div>
         <div class="retry-counter__value">
           <span id="retryCount">0</span>
         </div>
@@ -38,14 +42,14 @@
 
     <section class="draw-card">
       <div class="input-group">
-        <label for="playerName" class="input-group__label">抽獎名稱</label>
-        <input id="playerName" type="text" placeholder="請輸入名字" />
+        <label for="username" class="input-group__label">抽獎名稱</label>
+        <input id="username" type="text" placeholder="請輸入名字" />
       </div>
 
       <div class="button-row">
-        <button id="drawOnceBtn" class="button button--primary">抽 1 次</button>
-        <button id="drawTenBtn" class="button button--secondary">抽 10 次</button>
-        <button id="clearResultsBtn" class="button button--ghost">清空結果</button>
+        <button id="drawOnceButton" class="button button--primary">抽 1 次</button>
+        <button id="drawTenButton" class="button button--secondary">抽 10 次</button>
+        <button id="clearResultsButton" class="button button--ghost">清空結果</button>
       </div>
 
       <section class="probability-card">
@@ -58,6 +62,7 @@
           <h2>抽獎結果</h2>
         </div>
         <div id="resultsContainer" class="results-container"></div>
+        <p id="resultsPlaceholder" class="results-placeholder">尚未開始抽獎。</p>
       </section>
     </section>
   </main>
