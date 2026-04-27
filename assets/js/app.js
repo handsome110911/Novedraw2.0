@@ -1,51 +1,78 @@
 const STORAGE_KEYS = {
-  leaderboard: 'novedraw.leaderboard',
-  retryCount: 'novedraw.retryCount',
+  grandBoard: 'novedraw.grandBoard',
+  normalBoard: 'novedraw.normalBoard',
 };
 
 const PRIZES = [
-  { name: '大獎 - 立牌（雙馬尾）', chance: 1, type: 'grand' },
-  { name: '大獎 - 立牌（長髮）', chance: 1, type: 'grand' },
-  { name: '再來一次', chance: 10, type: 'retry' },
-  { name: '哈哈 沒抽到', chance: 88, type: 'normal' },
+  { name: '大獎 - 永BAN', chance: 1, type: 'grand' },
+  { name: '普通獎 - 禁止留言600秒', chance: 9, type: 'normalWin' },
+  { name: '沒中獎 - 哈哈 雜魚', chance: 45, type: 'lose' },
+  { name: '沒中獎 - 真沒用', chance: 45, type: 'lose' },
 ];
 
+const CHEAT_NAMES = ['達克仔', '達克', '諾芙', 'nove', 'nove.exe'];
+
+const CHEAT_PRIZE = {
+  name: '立刻匯款500萬到達克仔戶頭',
+  chance: 0,
+  type: 'cheat',
+};
+
 const state = {
-  leaderboard: loadLeaderboard(),
-  retryCount: loadRetryCount(),
+  grandBoard: loadBoard(STORAGE_KEYS.grandBoard),
+  normalBoard: loadBoard(STORAGE_KEYS.normalBoard),
   isDrawing: false,
 };
 
 const elements = {
   username: document.getElementById('username'),
-  leaderboardList: document.getElementById('leaderboardList'),
-  leaderboardEmpty: document.getElementById('leaderboardEmpty'),
-  retryCount: document.getElementById('retryCount'),
+
+  grandBoardList: document.getElementById('grandBoardList'),
+  grandBoardEmpty: document.getElementById('grandBoardEmpty'),
+  resetGrandBoardButton: document.getElementById('resetGrandBoardButton'),
+
+  normalBoardList: document.getElementById('normalBoardList'),
+  normalBoardEmpty: document.getElementById('normalBoardEmpty'),
+  resetNormalBoardButton: document.getElementById('resetNormalBoardButton'),
+
+  resultsSection: document.getElementById('resultsSection'),
   resultsContainer: document.getElementById('resultsContainer'),
   resultsPlaceholder: document.getElementById('resultsPlaceholder'),
   probabilityList: document.getElementById('probabilityList'),
+
   drawOnceButton: document.getElementById('drawOnceButton'),
   drawTenButton: document.getElementById('drawTenButton'),
-  resetLeaderboardButton: document.getElementById('resetLeaderboardButton'),
-  resetRetryButton: document.getElementById('resetRetryButton'),
   clearResultsButton: document.getElementById('clearResultsButton'),
+
+  grandModal: document.getElementById('grandModal'),
+  grandModalMessage: document.getElementById('grandModalMessage'),
+  grandModalCloseButton: document.getElementById('grandModalCloseButton'),
 };
 
 initialize();
 
 function initialize() {
   renderProbabilityList();
-  renderLeaderboard();
-  renderRetryCount();
+  renderGrandBoard();
+  renderNormalBoard();
   bindEvents();
 }
 
 function bindEvents() {
   elements.drawOnceButton.addEventListener('click', () => drawPrize(1));
   elements.drawTenButton.addEventListener('click', () => drawPrize(10));
-  elements.resetLeaderboardButton.addEventListener('click', resetLeaderboard);
-  elements.resetRetryButton.addEventListener('click', resetRetryCounter);
   elements.clearResultsButton.addEventListener('click', clearResults);
+
+  elements.resetGrandBoardButton.addEventListener('click', resetGrandBoard);
+  elements.resetNormalBoardButton.addEventListener('click', resetNormalBoard);
+
+  elements.grandModalCloseButton.addEventListener('click', closeGrandModal);
+  elements.grandModal.addEventListener('click', (event) => {
+    if (event.target === elements.grandModal || event.target.classList.contains('modal__backdrop')) {
+      closeGrandModal();
+    }
+  });
+
   elements.username.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       drawPrize(1);
@@ -55,6 +82,7 @@ function bindEvents() {
 
 async function drawPrize(times) {
   const username = elements.username.value.trim();
+
   if (!username) {
     window.alert('請輸入您的名稱！');
     elements.username.focus();
@@ -69,8 +97,12 @@ async function drawPrize(times) {
   setButtonsDisabled(true);
   clearResults();
 
-  for (let index = 0; index < times; index += 1) {
-    const prize = getPrize();
+  const isCheatMode = isCheatName(username);
+  const drawTimes = isCheatMode ? 1 : times;
+
+  for (let index = 0; index < drawTimes; index += 1) {
+    const prize = isCheatMode ? CHEAT_PRIZE : getPrize();
+
     const resultCard = buildResultCard({
       username,
       drawNumber: index + 1,
@@ -84,21 +116,20 @@ async function drawPrize(times) {
       resultCard.classList.add('is-visible');
     });
 
-    if (prize.type === 'grand') {
-      addGrandPrizeRecord(username, prize.name);
-    }
+    handlePrizeRecord(username, prize);
 
-    if (prize.type === 'retry') {
-      state.retryCount += 1;
-      saveRetryCount();
-      renderRetryCount();
-    }
-
-    await delay(times === 1 ? 0 : 180);
+    await delay(drawTimes === 1 ? 0 : 180);
   }
+
+  scrollToResults();
 
   state.isDrawing = false;
   setButtonsDisabled(false);
+}
+
+function isCheatName(username) {
+  const normalizedUsername = username.toLowerCase();
+  return CHEAT_NAMES.some((name) => name.toLowerCase() === normalizedUsername);
 }
 
 function getPrize() {
@@ -116,6 +147,42 @@ function getPrize() {
   return PRIZES[PRIZES.length - 1];
 }
 
+function handlePrizeRecord(username, prize) {
+  if (prize.type === 'grand') {
+    addBoardRecord({
+      boardName: 'grandBoard',
+      storageKey: STORAGE_KEYS.grandBoard,
+      username,
+      prizeName: prize.name,
+    });
+    renderGrandBoard();
+    openGrandModal('永Ban再見');
+    return;
+  }
+
+  if (prize.type === 'normalWin') {
+    addBoardRecord({
+      boardName: 'normalBoard',
+      storageKey: STORAGE_KEYS.normalBoard,
+      username,
+      prizeName: prize.name,
+    });
+    renderNormalBoard();
+    return;
+  }
+
+  if (prize.type === 'cheat') {
+    addBoardRecord({
+      boardName: 'grandBoard',
+      storageKey: STORAGE_KEYS.grandBoard,
+      username,
+      prizeName: prize.name,
+    });
+    renderGrandBoard();
+    openGrandModal('立刻匯款500萬到達克仔戶頭');
+  }
+}
+
 function buildResultCard({ username, drawNumber, prize }) {
   const card = document.createElement('article');
   card.className = `result-card ${getResultModifierClass(prize.type)}`.trim();
@@ -130,53 +197,67 @@ function buildResultCard({ username, drawNumber, prize }) {
 
   card.appendChild(meta);
   card.appendChild(prizeText);
+
   return card;
 }
 
 function getResultModifierClass(type) {
   if (type === 'grand') return 'result-card--grand';
-  if (type === 'retry') return 'result-card--retry';
+  if (type === 'normalWin') return 'result-card--normal-win';
+  if (type === 'cheat') return 'result-card--cheat';
+  if (type === 'lose') return 'result-card--lose';
   return '';
 }
 
-function addGrandPrizeRecord(username, prizeName) {
+function addBoardRecord({ boardName, storageKey, username, prizeName }) {
   const timestamp = new Date().toLocaleString('zh-Hant', {
     hour12: false,
   });
 
-  state.leaderboard.unshift({
+  state[boardName].unshift({
     username,
     prizeName,
     timestamp,
   });
 
-  saveLeaderboard();
-  renderLeaderboard();
+  saveBoard(storageKey, state[boardName]);
 }
 
-function renderLeaderboard() {
-  elements.leaderboardList.innerHTML = '';
+function renderGrandBoard() {
+  renderBoard({
+    listElement: elements.grandBoardList,
+    emptyElement: elements.grandBoardEmpty,
+    records: state.grandBoard,
+  });
+}
 
-  if (state.leaderboard.length === 0) {
-    elements.leaderboardEmpty.hidden = false;
+function renderNormalBoard() {
+  renderBoard({
+    listElement: elements.normalBoardList,
+    emptyElement: elements.normalBoardEmpty,
+    records: state.normalBoard,
+  });
+}
+
+function renderBoard({ listElement, emptyElement, records }) {
+  listElement.innerHTML = '';
+
+  if (records.length === 0) {
+    emptyElement.hidden = false;
     return;
   }
 
-  elements.leaderboardEmpty.hidden = true;
+  emptyElement.hidden = true;
 
-  state.leaderboard.forEach((record) => {
+  records.forEach((record) => {
     const item = document.createElement('li');
     item.innerHTML = `
       <strong>${escapeHtml(record.username)}</strong><br>
       ${escapeHtml(record.prizeName)}<br>
       <span>${escapeHtml(record.timestamp)}</span>
     `;
-    elements.leaderboardList.appendChild(item);
+    listElement.appendChild(item);
   });
-}
-
-function renderRetryCount() {
-  elements.retryCount.textContent = String(state.retryCount);
 }
 
 function renderProbabilityList() {
@@ -189,16 +270,16 @@ function renderProbabilityList() {
   });
 }
 
-function resetLeaderboard() {
-  state.leaderboard = [];
-  saveLeaderboard();
-  renderLeaderboard();
+function resetGrandBoard() {
+  state.grandBoard = [];
+  saveBoard(STORAGE_KEYS.grandBoard, state.grandBoard);
+  renderGrandBoard();
 }
 
-function resetRetryCounter() {
-  state.retryCount = 0;
-  saveRetryCount();
-  renderRetryCount();
+function resetNormalBoard() {
+  state.normalBoard = [];
+  saveBoard(STORAGE_KEYS.normalBoard, state.normalBoard);
+  renderNormalBoard();
 }
 
 function clearResults() {
@@ -211,9 +292,27 @@ function setButtonsDisabled(isDisabled) {
   elements.drawTenButton.disabled = isDisabled;
 }
 
-function loadLeaderboard() {
+function scrollToResults() {
+  elements.resultsSection.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  });
+}
+
+function openGrandModal(message) {
+  elements.grandModalMessage.textContent = message;
+  elements.grandModal.hidden = false;
+  document.body.classList.add('modal-open');
+}
+
+function closeGrandModal() {
+  elements.grandModal.hidden = true;
+  document.body.classList.remove('modal-open');
+}
+
+function loadBoard(storageKey) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.leaderboard);
+    const raw = localStorage.getItem(storageKey);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -221,22 +320,8 @@ function loadLeaderboard() {
   }
 }
 
-function saveLeaderboard() {
-  localStorage.setItem(STORAGE_KEYS.leaderboard, JSON.stringify(state.leaderboard));
-}
-
-function loadRetryCount() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.retryCount);
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function saveRetryCount() {
-  localStorage.setItem(STORAGE_KEYS.retryCount, String(state.retryCount));
+function saveBoard(storageKey, value) {
+  localStorage.setItem(storageKey, JSON.stringify(value));
 }
 
 function delay(milliseconds) {
