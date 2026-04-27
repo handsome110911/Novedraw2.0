@@ -15,7 +15,7 @@
       <p class="hero__tag">Novedraw Lottery</p>
       <h1>諾芙新人畢業紀念周邊抽獎</h1>
       <p class="hero__description">
-        輸入名字後即可進行抽獎。大獎會進入榜單，再來一次會累積次數。
+        輸入名字後即可進行抽獎。大獎會進入大獎榜，普通獎會進入普通獎榜。
       </p>
     </header>
 
@@ -23,20 +23,19 @@
       <section class="panel">
         <div class="panel__header">
           <h2>大獎榜單</h2>
-          <button id="resetLeaderboardButton" class="button button--ghost">清空榜單</button>
+          <button id="resetGrandBoardButton" class="button button--ghost">清空大獎</button>
         </div>
-        <ul id="leaderboardList" class="leaderboard-list"></ul>
-        <p id="leaderboardEmpty" class="panel__empty">目前還沒有大獎得主。</p>
+        <ul id="grandBoardList" class="leaderboard-list"></ul>
+        <p id="grandBoardEmpty" class="panel__empty">目前還沒有大獎得主。</p>
       </section>
 
-      <section class="panel retry-counter">
+      <section class="panel">
         <div class="panel__header">
-          <h2>再來一次</h2>
-          <button id="resetRetryButton" class="button button--ghost">重置次數</button>
+          <h2>普通獎榜單</h2>
+          <button id="resetNormalBoardButton" class="button button--ghost">清空普通獎</button>
         </div>
-        <div class="retry-counter__value">
-          <span id="retryCount">0</span>
-        </div>
+        <ul id="normalBoardList" class="leaderboard-list"></ul>
+        <p id="normalBoardEmpty" class="panel__empty">目前還沒有普通獎得主。</p>
       </section>
     </section>
 
@@ -57,7 +56,7 @@
         <ul id="probabilityList" class="probability-list"></ul>
       </section>
 
-      <section class="results-section">
+      <section class="results-section" id="resultsSection">
         <div class="results-section__header">
           <h2>抽獎結果</h2>
         </div>
@@ -66,6 +65,16 @@
       </section>
     </section>
   </main>
+
+  <div id="grandModal" class="modal" hidden>
+    <div class="modal__backdrop"></div>
+    <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="grandModalTitle">
+      <p class="modal__tag">Grand Prize</p>
+      <h2 id="grandModalTitle">恭喜中獎</h2>
+      <p id="grandModalMessage" class="modal__message">永Ban再見</p>
+      <button id="grandModalCloseButton" class="button button--primary">確認</button>
+    </div>
+  </div>
 
   <script src="assets/js/app.js"></script>
 </body>
