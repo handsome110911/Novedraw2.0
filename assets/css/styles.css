@@ -62,11 +62,14 @@ button {
 
 .background-overlay {
   background:
-    linear-gradient(180deg, rgba(7, 12, 23, 0.34) 0%, rgba(7, 12, 23, 0.84) 100%),
-    rgba(0, 0, 0, 0.28);
+    linear-gradient(
+      180deg,
+      rgba(7, 12, 23, 0.22) 0%,
+      rgba(7, 12, 23, 0.36) 45%,
+      rgba(7, 12, 23, 0.48) 100%
+    );
   z-index: -1;
 }
-
 .page-shell {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
